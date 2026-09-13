@@ -1,0 +1,50 @@
+datasets:
+
+  village_boundaries:
+    provider: Survey of India
+    status: pending
+    priority: critical
+    type: vector
+    raw_directory: data/raw/boundaries
+
+  census_population:
+    provider: Census of India
+    status: pending
+    priority: critical
+    type: tabular
+    raw_directory: data/raw/census
+
+  dem:
+    provider: TBD
+    status: pending
+    priority: critical
+    type: raster
+    raw_directory: data/raw/dem
+
+  landslide:
+    provider: Geological Survey of India
+    status: pending
+    priority: critical
+    type: vector_or_raster
+    raw_directory: data/raw/landslide
+
+  rainfall:
+    provider: India Meteorological Department
+    status: pending
+    priority: critical
+    type: raster_or_timeseries
+    raw_directory: data/raw/rainfall
+
+  flood:
+    provider: NRSC/Bhuvan
+    status: pending
+    priority: critical
+    type: geospatial
+    raw_directory: data/raw/flood
+
+  roads:
+    provider: OpenStreetMap
+    status: pending
+    priority: critical
+    type: vector
+    raw_directory: data/raw/roads

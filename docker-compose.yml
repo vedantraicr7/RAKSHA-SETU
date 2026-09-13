@@ -1,0 +1,22 @@
+services:
+
+  postgis:
+    image: postgis/postgis:17-3.5
+
+    container_name: raksha_postgis
+
+    environment:
+      POSTGRES_DB: raksha_setu
+      POSTGRES_USER: raksha
+      POSTGRES_PASSWORD: raksha_dev_password
+
+    ports:
+      - "5432:5432"
+
+    volumes:
+      - raksha_postgres_data:/var/lib/postgresql/data
+
+    restart: unless-stopped
+
+volumes:
+  raksha_postgres_data:

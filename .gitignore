@@ -1,0 +1,52 @@
+# =========================================================
+# Python
+# =========================================================
+
+.venv/
+.env
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+# =========================================================
+# Node / React
+# =========================================================
+
+frontend/node_modules/
+frontend/dist/
+
+# =========================================================
+# Raw / generated geospatial data
+# =========================================================
+
+data/raw/*
+!data/raw/.gitkeep
+
+data/interim/*
+!data/interim/.gitkeep
+
+data/processed/*
+!data/processed/.gitkeep
+
+# Large geospatial formats anywhere
+*.tif
+*.tiff
+*.shp
+*.shx
+*.dbf
+*.prj
+*.gpkg
+*.osm
+*.osm.pbf
+*.nc
+*.rar
+*.zip
+
+# =========================================================
+# Temporary / OS files
+# =========================================================
+
+.DS_Store
+*.tmp
+*.log
+*.save
