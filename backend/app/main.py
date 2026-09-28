@@ -343,3 +343,29 @@ def summary():
         "relocation_links":
             len(LINKS["features"]),
     }
+# ==========================================================
+# DYNAMIC MULTI-HAZARD DIGITAL TWIN
+# ==========================================================
+
+from backend.app.dynamic_risk import calculate_dynamic_risk
+
+
+@app.get("/api/dynamic-risk")
+def get_dynamic_risk(
+    rainfall_trigger: float = 0.0
+):
+    """
+    Scenario-driven dynamic multi-hazard risk.
+
+    rainfall_trigger:
+        0.0 = baseline
+        0.5 = severe rainfall scenario
+        1.0 = extreme rainfall scenario
+
+    Current trigger values are prototype scenario
+    parameters, not live meteorological measurements.
+    """
+
+    return calculate_dynamic_risk(
+        rainfall_trigger
+    )
