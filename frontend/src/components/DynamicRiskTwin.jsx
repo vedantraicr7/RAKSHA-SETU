@@ -163,11 +163,10 @@ function FitDynamicBounds({
 }
 
 
-function DynamicRiskTwin() {
-  const [
-    trigger,
-    setTrigger,
-  ] = useState(0);
+function DynamicRiskTwin({
+  trigger,
+  setTrigger,
+}) {
 
   const [
     data,
@@ -587,7 +586,7 @@ function DynamicRiskTwin() {
       </div>
 
 
-      <div className="dynamic-map-panel">
+      <div className="dynamic-map-panel" style={{ display: "none" }}>
         <div className="dynamic-map-header">
           <div>
             <h3>

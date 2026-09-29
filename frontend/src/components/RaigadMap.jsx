@@ -91,6 +91,7 @@ function FitSelection({
 
 function RaigadMap({
   externalVillageCode,
+  scenarioTrigger = 0,
 }) {
   const [
     habitations,
@@ -100,6 +101,12 @@ function RaigadMap({
   const [
     sites,
     setSites,
+  ] = useState(null);
+
+  // Scenario-dependent habitation risk layer
+  const [
+    dynamicRisk,
+    setDynamicRisk,
   ] = useState(null);
 
   const [
@@ -213,6 +220,40 @@ function RaigadMap({
   }, []);
 
   useEffect(() => {
+    let cancelled = false;
+
+    async function loadDynamicRisk() {
+      try {
+        const response = await axios.get(
+          `${API}/api/dynamic-risk`,
+          {
+            params: {
+              rainfall_trigger: scenarioTrigger,
+            },
+          }
+        );
+
+        if (!cancelled) {
+          setDynamicRisk(
+            response.data?.geojson ?? null
+          );
+        }
+      } catch (err) {
+        console.error(
+          "Unable to load dynamic risk layer:",
+          err
+        );
+      }
+    }
+
+    loadDynamicRisk();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [scenarioTrigger]);
+
+  useEffect(() => {
     if (
       !habitations?.features
     ) {
@@ -276,6 +317,24 @@ function RaigadMap({
     searchTerm,
     habitations,
   ]);
+
+  const visibleDynamicRisk = {
+    type: "FeatureCollection",
+
+    features:
+      dynamicRisk?.features?.filter(
+        (feature) => {
+          const p =
+            feature.properties || {};
+
+          return (
+            p.dynamic_zone === "RED" ||
+            p.dynamic_zone === "ORANGE" ||
+            p.newly_red === true
+          );
+        }
+      ) || [],
+  };
 
   const filteredHabitations = {
     type: "FeatureCollection",
@@ -507,6 +566,39 @@ function RaigadMap({
     };
   };
 
+  const dynamicRiskStyle =
+    (feature) => {
+      const zone =
+        feature?.properties
+          ?.dynamic_zone;
+
+      const colors = {
+        RED: "#dc2626",
+        ORANGE: "#f97316",
+        YELLOW: "#eab308",
+        GREEN: "#16a34a",
+      };
+
+      const color =
+        colors[zone] ||
+        "#64748b";
+
+      return {
+        color:
+          feature?.properties
+            ?.newly_red
+            ? "#ffffff"
+            : color,
+        weight:
+          feature?.properties
+            ?.newly_red
+            ? 4
+            : 2,
+        fillColor: color,
+        fillOpacity: 0.72,
+      };
+    };
+
   const focusedHabitationStyle =
     {
       color: "#ffffff",
@@ -681,29 +773,28 @@ function RaigadMap({
 
         <div className="map-legend">
           <span>
-            🔴 Recommended
+            🔴 Red Zone
           </span>
 
           <span>
-            🟠 Capacity
-            constraint
+            🟠 Orange Zone
           </span>
 
           <span>
-            🟣 No nearby site
+            ⚪ Newly Red
           </span>
 
           <span>
-            🟢 Relocation site
+            🟢 Relocation Site
           </span>
 
           <span>
-            🔵 Relocation link
+            🔵 Selected Relocation Link
           </span>
         </div>
       </div>
 
-      <div className="map-filters">
+      <div className="map-filters" style={{ display: "none" }}>
         <button
           className={
             decisionFilter ===
@@ -769,7 +860,7 @@ function RaigadMap({
         </button>
       </div>
 
-      <div className="map-filters hazard-filters">
+      <div className="map-filters hazard-filters" style={{ display: "none" }}>
         <button
           className={
             hazardFilter ===
@@ -926,14 +1017,56 @@ function RaigadMap({
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
 
-          {links && (
+          {dynamicRisk && (
             <GeoJSON
-              data={links}
-              style={
-                linkStyle
-              }
+              key={`dynamic-risk-${scenarioTrigger}`}
+              data={visibleDynamicRisk}
+              pointToLayer={(feature, latlng) => {
+                const p =
+                  feature?.properties || {};
+
+                const colors = {
+                  RED: "#dc2626",
+                  ORANGE: "#f97316",
+                  YELLOW: "#eab308",
+                  GREEN: "#16a34a",
+                };
+
+                const color =
+                  colors[p.dynamic_zone] ||
+                  "#64748b";
+
+                return L.circleMarker(
+                  latlng,
+                  {
+                    radius:
+                      p.newly_red
+                        ? 7
+                        : p.dynamic_zone === "RED"
+                          ? 6
+                          : 5,
+
+                    color:
+                      p.newly_red
+                        ? "#ffffff"
+                        : color,
+
+                    weight:
+                      p.newly_red
+                        ? 3
+                        : 2,
+
+                    fillColor: color,
+                    fillOpacity: 0.8,
+                  }
+                );
+              }}
             />
           )}
+
+          {/* District-wide relocation links are hidden
+              to keep the map readable. The selected
+              habitation link is displayed below. */}
 
           {focusedLink && (
             <GeoJSON
@@ -947,20 +1080,9 @@ function RaigadMap({
             />
           )}
 
-          {habitations && (
-            <GeoJSON
-              key={`${decisionFilter}-${hazardFilter}`}
-              data={
-                filteredHabitations
-              }
-              style={
-                habitationStyle
-              }
-              onEachFeature={
-                bindHabitationPopup
-              }
-            />
-          )}
+          {/* Static priority habitation layer is intentionally
+              not drawn here. Its data remains available for
+              search, selection and relocation decisions. */}
 
           {focusedFeature && (
             <GeoJSON

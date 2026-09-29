@@ -13,6 +13,9 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
+  // Shared scenario state for the simulator and master map
+  const [scenarioTrigger, setScenarioTrigger] = useState(0);
+
   // Shared state between table and map
   const [selectedVillageCode, setSelectedVillageCode] =
     useState(null);
@@ -298,7 +301,10 @@ function App() {
           </div>
         </section>
 
-        <DynamicRiskTwin />
+        <DynamicRiskTwin
+          trigger={scenarioTrigger}
+          setTrigger={setScenarioTrigger}
+        />
 
         <PriorityTable
           onVillageSelect={
@@ -310,6 +316,9 @@ function App() {
           <RaigadMap
             externalVillageCode={
               selectedVillageCode
+            }
+            scenarioTrigger={
+              scenarioTrigger
             }
           />
         </div>
