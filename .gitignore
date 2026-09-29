@@ -58,3 +58,6 @@ data/processed/frontend/*
 !data/processed/frontend/recommended_habitations.geojson
 !data/processed/frontend/recommended_sites.geojson
 !data/processed/frontend/relocation_links.geojson
+
+# Deployment dataset required by dynamic risk API
+!data/processed/raigad_habitations_multihazard.gpkg
