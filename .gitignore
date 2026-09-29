@@ -50,3 +50,11 @@ data/processed/*
 *.tmp
 *.log
 *.save
+
+# Deployment datasets required by RAKSHA-SETU API
+!data/processed/frontend/
+data/processed/frontend/*
+!data/processed/frontend/priority_decisions.geojson
+!data/processed/frontend/recommended_habitations.geojson
+!data/processed/frontend/recommended_sites.geojson
+!data/processed/frontend/relocation_links.geojson
